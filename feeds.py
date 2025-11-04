@@ -30,7 +30,7 @@ def normalise_entry(e: Any) -> Dict:
         "title": title,
         "link": link,
         "summary": summary,
-        "published": published
+        "published": published,
         "raw": e,
     }
 
