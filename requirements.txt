@@ -2,4 +2,4 @@ python-dotenv>=1.0.0
 feedparser>=6.0.8
 psycopg2-binary>=2.9.6
 Jinja2>=3.1.2
-requests
+requests>=2.31.0
