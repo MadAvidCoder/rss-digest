@@ -41,7 +41,7 @@ def init_db():
     # Table to hold settings
     cur.execute("""
         CREATE TABLE IF NOT EXISTS settings (
-            key TEXT PRIAMRY KEY,
+            key TEXT PRIMARY KEY,
             value TEXT
         )
     """)
