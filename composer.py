@@ -14,179 +14,182 @@ HTML_TEMPLATE = """
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>{{ subject }}</title>
   <style>
-    /* Minimal fallback styles; main styling is inline for clients that drop head styles */
     @media only screen and (max-width:620px){
       .container{width:100% !important;}
       .two-col{display:block !important; width:100% !important;}
       .col{display:block !important; width:100% !important;}
       .thumbnail{width:100% !important; height:auto !important;}
+      .feed-badge{display:inline-flex;align-items:center;gap:8px;}
     }
+    /* Keep minor styles here; main styles inline for best compatibility */
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
-  <!-- Preheader: hidden in the message body but shown by many inboxes as the preview snippet -->
+<body style="margin:0;padding:0;background-color:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <!-- Preheader -->
   <span style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
     {{ preheader }}
   </span>
 
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background-color:#f4f6f8;width:100%;padding:18px 12px;">
-    <tr>
-      <td align="center">
-        <table class="container" width="700" cellpadding="0" cellspacing="0" border="0" role="presentation" style="width:700px;max-width:700px;">
-          <tr>
-            <td style="padding:12px 0;text-align:left;">
-              <!-- Header / Hero -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background:#ffffff;border-radius:10px;padding:18px;border:1px solid #e9eef5;">
-                <tr>
-                  <td style="vertical-align:middle;padding-bottom:12px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
-                      <tr>
-                        <td style="vertical-align:middle;">
-                          <img src="{{ brand_icon }}" width="48" height="48" alt="" style="display:block;border-radius:8px;border:1px solid #eef3fa;"/>
-                        </td>
-                        <td style="vertical-align:middle;padding-left:12px;">
-                          <div style="font-size:18px;font-weight:700;color:#0b2a66;line-height:1.1;">{{ from_name }}</div>
-                          <div style="font-size:13px;color:#6b7280;margin-top:6px;">{{ subject }}</div>
-                        </td>
-                        <td style="vertical-align:middle;text-align:right;">
-                          <div style="font-size:12px;color:#94a3b8;">{{ generated_at }}</div>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background-color:#f5f7fb;width:100%;padding:20px 12px;">
+    <tr><td align="center">
+      <table class="container" width="720" cellpadding="0" cellspacing="0" border="0" role="presentation" style="width:720px;max-width:720px;">
+        <tr>
+          <td style="padding:12px 0;">
+            <!-- Header -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background:#ffffff;border-radius:10px;padding:16px;border:1px solid #e9eef5;">
+              <tr>
+                <td style="vertical-align:middle;">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                    <tr>
+                      <td style="vertical-align:middle;">
+                        <img src="{{ brand_icon }}" width="48" height="48" alt="" style="display:block;border-radius:10px;border:1px solid #eef3fa;"/>
+                      </td>
+                      <td style="vertical-align:middle;padding-left:12px;">
+                        <div style="font-size:18px;font-weight:700;color:#0b2a66;line-height:1.1;">{{ from_name }}</div>
+                        <div style="font-size:13px;color:#6b7280;margin-top:6px;">{{ subject }}</div>
+                      </td>
+                      <td style="vertical-align:middle;text-align:right;">
+                        <div style="font-size:12px;color:#94a3b8;">{{ generated_at }}</div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
 
-                {% if intro %}
-                <tr>
-                  <td style="padding:8px 0 14px 0;font-size:14px;color:#374151;">
-                    {{ intro }}
-                  </td>
-                </tr>
-                {% endif %}
+              {% if intro %}
+              <tr><td style="padding-top:10px;padding-bottom:8px;color:#374151;font-size:14px;">{{ intro }}</td></tr>
+              {% endif %}
 
-                <!-- TOC -->
-                {% if items %}
-                <tr>
-                  <td style="padding:6px 0 12px 0;">
-                    <div style="font-size:13px;color:#6b7280;font-weight:600;margin-bottom:8px;">In this digest ({{ items|length }})</div>
-                    <table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%" style="border-collapse:collapse;">
-                      {% for it in items %}
-                      <tr>
-                        <td style="padding:6px 0;">
-                          <a href="#item-{{ loop.index0 }}" style="color:#0f62fe;text-decoration:none;font-size:14px;">{{ loop.index }}. {{ it.title }}</a>
-                          <div style="color:#8292a6;font-size:12px;margin-top:2px;">{{ it.feed_title or it.feed_url }}</div>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </table>
-                  </td>
-                </tr>
-                {% endif %}
-              </table>
-            </td>
-          </tr>
+              <!-- Compact feeds summary -->
+              {% if feed_list %}
+              <tr>
+                <td style="padding-top:6px;padding-bottom:8px;">
+                  <div style="font-size:13px;color:#6b7280;font-weight:600;margin-bottom:8px;">Feeds in this digest</div>
+                  <table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%">
+                    <tr>
+                      <td style="padding:6px 0;">
+                        {% for f in feed_list %}
+                          <span style="display:inline-flex;align-items:center;gap:8px;margin-right:10px;margin-bottom:6px;">
+                            <img src="{{ f.icon }}" width="18" height="18" alt="" style="display:block;border-radius:4px;border:1px solid #eef3fa;"/>
+                            <span style="font-size:13px;color:#0f172a;">{{ f.name }}</span>
+                            <span style="font-size:12px;color:#94a3b8;margin-left:6px;">({{ f.count }})</span>
+                          </span>
+                        {% endfor %}
+                      </td>
+                      <td style="text-align:right;">
+                        <a href="#full-toc" style="color:#0f62fe;text-decoration:none;font-size:13px;font-weight:600;">View full table of contents</a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              {% endif %}
+            </table>
+          </td>
+        </tr>
 
-          <!-- Items -->
-          {% for it in items %}
-          <tr>
-            <td style="padding-top:12px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background:#ffffff;border-radius:10px;border:1px solid #e9eef5;">
-                <tr>
-                  <td style="padding:12px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
-                      <tr class="two-col">
-                        <!-- Content column -->
-                        <td class="col" valign="top" style="padding-right:12px;vertical-align:top;">
-                          <table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%">
-                            <tr>
-                              <td style="padding-bottom:8px;">
-                                <table cellpadding="0" cellspacing="0" border="0" role="presentation">
-                                  <tr>
-                                    <td style="vertical-align:middle;padding-right:8px;">
-                                      <img src="{{ it.feed_icon }}" width="28" height="28" alt="" style="display:block;border-radius:6px;border:1px solid #eef3fa;" />
-                                    </td>
-                                    <td style="vertical-align:middle;font-size:13px;color:#6b7280;">
-                                      <strong style="font-weight:700;color:#0b2a66;">{{ it.feed_title or it.feed_url }}</strong>
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
+        <!-- Full TOC (anchor target) -->
+        {% if items %}
+        <tr>
+          <td style="padding-top:10px;">
+            <a id="full-toc"></a>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background:#ffffff;border-radius:10px;padding:12px;border:1px solid #e9eef5;">
+              <tr>
+                <td style="font-size:14px;color:#0b2a66;font-weight:700;padding-bottom:8px;">Full table of contents</td>
+              </tr>
+              {% for it in items %}
+              <tr>
+                <td style="padding:6px 0;border-top:1px solid #f1f5f9;">
+                  <a href="#item-{{ loop.index0 }}" style="color:#0f62fe;text-decoration:none;font-size:14px;">{{ loop.index }}. {{ it.title }}</a>
+                  <div style="color:#8292a6;font-size:12px;margin-top:4px;">{{ it.feed_title or it.feed_url }}</div>
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+        {% endif %}
 
-                            <tr>
-                              <td style="padding-bottom:8px;">
-                                <a href="{{ it.link }}" style="color:#071033;text-decoration:none;font-size:16px;font-weight:700;">{{ it.title }}</a>
-                              </td>
-                            </tr>
+        <!-- Items -->
+        {% for it in items %}
+        <tr>
+          <td style="padding-top:12px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background:#ffffff;border-radius:10px;border:1px solid #e9eef5;">
+              <tr>
+                <td style="padding:12px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                    <tr class="two-col">
+                      <!-- Content -->
+                      <td class="col" valign="top" style="padding-right:12px;vertical-align:top;">
+                        <table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%">
+                          <tr><td style="padding-bottom:8px;">
+                            <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                              <tr>
+                                <td style="vertical-align:middle;padding-right:8px;">
+                                  <img src="{{ it.feed_icon }}" width="28" height="28" alt="" style="display:block;border-radius:6px;border:1px solid #eef3fa;" />
+                                </td>
+                                <td style="vertical-align:middle;font-size:13px;color:#6b7280;">
+                                  <strong style="font-weight:700;color:#0b2a66;">{{ it.feed_title or it.feed_url }}</strong>
+                                </td>
+                              </tr>
+                            </table>
+                          </td></tr>
 
-                            <tr>
-                              <td style="padding-bottom:10px;color:#6b7280;font-size:13px;">
-                                {% if it.category %}{{ it.category }} · {% endif %}{% if it.published %}{{ it.published|datetimeformat }}{% endif %}
-                              </td>
-                            </tr>
+                          <tr><td style="padding-bottom:8px;"><a href="{{ it.link }}" style="color:#071033;text-decoration:none;font-size:16px;font-weight:700;">{{ it.title }}</a></td></tr>
 
-                            <tr>
-                              <td style="padding-bottom:12px;color:#333a52;font-size:14px;line-height:1.45;">
-                                {{ it.summary | safe }}
-                              </td>
-                            </tr>
+                          <tr><td style="padding-bottom:10px;color:#6b7280;font-size:13px;">{% if it.category %}{{ it.category }} · {% endif %}{% if it.published %}{{ it.published|datetimeformat }}{% endif %}</td></tr>
 
-                            <tr>
-                              <td>
-                                <!-- Button row -->
-                                <table cellpadding="0" cellspacing="0" border="0" role="presentation">
-                                  <tr>
-                                    <td>
-                                      <a href="{{ it.link }}" style="background-color:#0f62fe;border-radius:6px;color:#ffffff;display:inline-block;padding:10px 14px;text-decoration:none;font-weight:600;font-size:13px;">
-                                        Read article
-                                      </a>
-                                    </td>
-                                    <td style="width:12px;">&nbsp;</td>
-                                    <td>
-                                      <a href="{{ it.link }}" style="color:#0f62fe;text-decoration:none;font-size:13px;font-weight:600;">Open in new tab</a>
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
+                          <tr><td style="padding-bottom:12px;color:#333a52;font-size:14px;line-height:1.45;">{{ it.summary | safe }}</td></tr>
 
-                          </table>
-                        </td>
+                          <tr>
+                            <td>
+                              <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                                <tr>
+                                  <td>
+                                    <a href="{{ it.link }}" style="background-color:#0f62fe;border-radius:6px;color:#ffffff;display:inline-block;padding:10px 14px;text-decoration:none;font-weight:600;font-size:13px;">
+                                      Read article
+                                    </a>
+                                  </td>
+                                  <td style="width:12px;">&nbsp;</td>
+                                  <td>
+                                    <a href="{{ it.link }}" style="color:#0f62fe;text-decoration:none;font-size:13px;font-weight:600;">Open in new tab</a>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
 
-                        <!-- Thumbnail column -->
-                        <td class="col" valign="top" style="width:180px;">
-                          {% if it.thumbnail %}
+                        </table>
+                      </td>
+
+                      <!-- Thumbnail -->
+                      <td class="col" valign="top" style="width:180px;">
+                        {% if it.thumbnail %}
                           <a href="{{ it.link }}"><img alt="" class="thumbnail" src="{{ it.thumbnail }}" width="170" height="110" style="display:block;border-radius:8px;border:1px solid #eef3fa;object-fit:cover;max-width:100%;height:auto;" /></a>
-                          {% else %}
+                        {% else %}
                           <div style="width:170px;height:110px;border-radius:8px;border:1px solid #eef3fa;background:#fbfdff;color:#6b7280;display:flex;align-items:center;justify-content:center;font-size:13px;">
                             {{ it.feed_title or '' }}
                           </div>
-                          {% endif %}
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          {% endfor %}
+                        {% endif %}
+                      </td>
 
-          <tr>
-            <td style="padding-top:14px;text-align:center;">
-              <table cellpadding="0" cellspacing="0" border="0" role="presentation">
-                <tr>
-                  <td style="font-size:13px;color:#94a3b8;">
-                    Sent by {{ from_name }} — {{ generated_at }}
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% endfor %}
 
-        </table>
-      </td>
-    </tr>
+        <tr><td style="padding-top:14px;text-align:center;">
+          <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+            <tr><td style="font-size:13px;color:#94a3b8;">Sent by {{ from_name }} — {{ generated_at }}</td></tr>
+          </table>
+        </td></tr>
+
+      </table>
+    </td></tr>
   </table>
 </body>
 </html>
@@ -277,6 +280,11 @@ def _extract_first_image(html_fragment: str, base_url: Optional[str]) -> Optiona
     except Exception:
         return src
 
+def _strip_first_image_from_html(html_fragment: str) -> str:
+    if not html_fragment:
+        return ""
+    return re.sub(r'<img\b[^>]*>', '', html_fragment, count=1, flags=re.I)
+
 def _strip_tags(html_text: str) -> str:
     if not html_text:
         return ""
@@ -306,27 +314,43 @@ def _truncate_text(s: str, max_chars: int = 600) -> str:
         return s[:cut+1].strip() + "…"
     return s[:max_chars].rstrip() + "…"
 
+def _generate_inline_svg_brand() -> str:
+    svg = (
+        "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'>"
+        "<defs>"
+        "<linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>"
+        "<stop offset='0' stop-color='#0f62fe'/>"
+        "<stop offset='1' stop-color='#1464f4'/>"
+        "</linearGradient>"
+        "</defs>"
+        "<rect width='120' height='120' rx='18' fill='url(#g)'/>"
+        "<text x='50%' y='56%' dominant-baseline='middle' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='46' fill='white' font-weight='700'>RD</text>"
+        "</svg>"
+    )
+    data_uri = "data:image/svg+xml;utf8," + svg.replace('"', "'")
+    return data_uri
+
 def _prepare_item(it: Dict, max_summary_chars: int) -> Dict:
     feed_url = it.get("feed_url") or it.get("feed") or ""
     base = _get_origin(feed_url) or feed_url
     summary_html = it.get("summary") or it.get("raw", {}).get("summary", "") or ""
     summary_html_abs = _make_urls_absolute(summary_html, base)
     thumbnail = _extract_first_image(summary_html_abs, base)
+    summary_without_first_img = _strip_first_image_from_html(summary_html_abs)
     if thumbnail and not re.match(r'^(http:|https:|data:|cid:)', thumbnail, re.I):
         thumbnail = urljoin(base, thumbnail)
-    summary_text = _strip_tags(summary_html_abs)
+    summary_text = _strip_tags(summary_without_first_img)
     short_summary = _truncate_text(summary_text, max_summary_chars) if max_summary_chars else summary_text
     feed_icon = _favicon_url_for_feed(feed_url) or ""
     return {
         **it,
-        "summary": summary_html_abs or html.escape(short_summary),
+        "summary": summary_without_first_img or html.escape(short_summary),
         "summary_text": summary_text,
         "short_summary": short_summary,
         "thumbnail": thumbnail,
         "feed_icon": feed_icon,
         "feed_title": it.get("feed_title") or it.get("feed_name") or None,
     }
-
 
 def compose_digest(
     items: List[Dict],
@@ -340,6 +364,16 @@ def compose_digest(
         items = items[:max_items]
 
     prepared = [_prepare_item(it, max_summary_chars) for it in items]
+
+    feed_counts: Dict[str, Dict] = {}
+    for it in prepared:
+        name = (it.get("feed_title") or it.get("feed_url") or "unknown").strip()
+        icon = it.get("feed_icon") or _favicon_url_for_feed(it.get("feed_url"))
+        key = name
+        if key not in feed_counts:
+            feed_counts[key] = {"name": name, "icon": icon, "count": 0}
+        feed_counts[key]["count"] += 1
+    feed_list = list(feed_counts.values())
 
     subject = subject_override or f"{getattr(config, 'SUBJECT_PREFIX', '[RSS]')} Daily Digest — {datetime.now(UTC).date()}"
 
@@ -360,7 +394,7 @@ def compose_digest(
     if prepared:
         brand_icon = prepared[0].get("feed_icon") or _favicon_url_for_feed(prepared[0].get("feed_url"))
     if not brand_icon:
-        brand_icon = "https://icons.duckduckgo.com/ip3/rss-digest.local.ico"
+        brand_icon = _generate_inline_svg_brand()
 
     html_body = tpl.render(
         subject=subject,
@@ -369,6 +403,7 @@ def compose_digest(
         from_name=getattr(config, "FROM_NAME", "RSS Digest"),
         generated_at=datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
         brand_icon=brand_icon,
+        feed_list=feed_list,
         preheader=pre,
     )
 
