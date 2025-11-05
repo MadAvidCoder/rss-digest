@@ -42,7 +42,7 @@ def fetch_feed(
     modified: Optional[float] = None,
     max_entries: Optional[int] = None,
 ) -> Dict:
-    headers = {"User-Agent": USER_AGENT}
+    headers: Dict[str, Any] = {"User-Agent": USER_AGENT}
     if etag:
         headers["If-None-Match"] = etag
     if modified:
