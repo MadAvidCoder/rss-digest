@@ -4,7 +4,6 @@ from email.message import EmailMessage
 import smtplib
 import ssl
 import re
-from smtplib import SMTP_SSL
 from typing import List, Optional, Union
 import config
 import logging
@@ -52,6 +51,14 @@ def html_to_text(html: str) -> str:
     text = re.sub(r"[ \t]{2,}", " ", text)
     return text.strip()
 
+def _create_ssl_context(skip_verify: bool) -> ssl.SSLContext:
+    if skip_verify:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        return ctx
+    return ssl.create_default_context()
+
 def send_digest(
     recipients: Union[str, List[str]],
     subject: str,
@@ -67,8 +74,6 @@ def send_digest(
     from_addr = config.EMAIL_FROM
     if not from_addr:
         raise RuntimeError("send_digest(): EMAIL_FROM is not configured in .env")
-    if not config.EMAIL_PASSWORD:
-        raise RuntimeError("send_digest(): EMAIL_PASSWORD is not configured in .env")
 
     original_masked = _mask_recipients(rcpts)
 
@@ -86,22 +91,27 @@ def send_digest(
     if not text_body:
         text_body = html_to_text(html_body)
 
-    smtp_server = getattr(config, "SMTP_SERVER", "smtp.hackclub.app")
+    smtp_server = getattr(config, "SMTP_SERVER", "smtp.gmail.com")
     smtp_port = int(getattr(config, "SMTP_PORT", 587))
     skip_auth = getattr(config, "SKIP_SMTP_AUTH", False)
+    skip_tls_verify = getattr(config, "SKIP_TLS_VERIFY", False)
+    smtp_login_user = getattr(config, "SMTP_USERNAME", None) or from_addr
+
+    if skip_tls_verify:
+        logger.warning("SKIP_TLS_VERIFY is enabled: TLS certificate verification will be disabled (INSECURE; testing only)")
 
     masked = _mask_recipients(rcpts)
     if config.DEBUG:
         logger.info("Preparing to send digest to %d recipients: %s", len(rcpts), ", ".join(masked))
 
     def _open_smtp():
+        context = _create_ssl_context(skip_tls_verify)
         if smtp_port == 465:
-            context = ssl.create_default_context()
             server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=SMTP_TIMEOUT, context=context)
             if not skip_auth:
                 if not getattr(config, "EMAIL_PASSWORD", None):
                     raise RuntimeError("EMAIL_PASSWORD required for SMTP authentication")
-                server.login(from_addr, config.EMAIL_PASSWORD)
+                server.login(smtp_login_user, config.EMAIL_PASSWORD)
             return server
         else:
             server = smtplib.SMTP(smtp_server, smtp_port, timeout=SMTP_TIMEOUT)
@@ -115,7 +125,7 @@ def send_digest(
             if not skip_auth:
                 if not getattr(config, "EMAIL_PASSWORD", None):
                     raise RuntimeError("EMAIL_PASSWORD required for SMTP authentication")
-                server.login(from_addr, config.EMAIL_PASSWORD)
+                server.login(smtp_login_user, config.EMAIL_PASSWORD)
             return server
 
     server = None
