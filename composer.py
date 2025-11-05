@@ -42,7 +42,7 @@ HTML_TEMPLATE = """
                   <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
                     <tr>
                       <td style="vertical-align:middle;">
-                        <image src="https://upload.wikimedia.org/wikipedia/commons/f/f4/Feed-icon.png" width=48px height=48px">
+                        <image src="https://upload.wikimedia.org/wikipedia/commons/f/f4/Feed-icon.png" width=48px height=48px>
                       </td>
                       <td style="vertical-align:middle;padding-left:12px;">
                         <div style="font-size:18px;font-weight:700;color:#0b2a66;line-height:1.05;">{{ from_name }}</div>
