@@ -4,6 +4,7 @@ from email.message import EmailMessage
 import smtplib
 import ssl
 import re
+from smtplib import SMTP_SSL
 from typing import List, Optional, Union
 import config
 import logging
@@ -68,6 +69,15 @@ def send_digest(
         raise RuntimeError("send_digest(): EMAIL_FROM is not configured in .env")
     if not config.EMAIL_PASSWORD:
         raise RuntimeError("send_digest(): EMAIL_PASSWORD is not configured in .env")
+
+    original_masked = _mask_recipients(rcpts)
+
+    if getattr(config, "TEST_EMAIL", None):
+        test_addr = config.TEST_EMAIL.strip()
+        if not test_addr:
+            raise ValueError("TEST_EMAIL is set but empty")
+        logger.info("TEST_EMAIL override active: routing all outgoing mail to test address %s (original recipients were: %s)", test_addr, ", ".join(original_masked))
+        rcpts = [test_addr]
 
     if getattr(config, "DRY_RUN", False):
         logger.info("DRY_RUN enabled: composing email but not sending. Recipients (masked): %s", ", ".join(_mask_recipients(rcpts)))
