@@ -69,17 +69,29 @@ def send_digest(
     if not config.EMAIL_PASSWORD:
         raise RuntimeError("send_digest(): EMAIL_PASSWORD is not configured in .env")
 
+    if getattr(config, "DRY_RUN", False):
+        logger.info("DRY_RUN enabled: composing email but not sending. Recipients (masked): %s", ", ".join(_mask_recipients(rcpts)))
+        return
+
     if not text_body:
         text_body = html_to_text(html_body)
 
     smtp_server = getattr(config, "SMTP_SERVER", "smtp.hackclub.app")
     smtp_port = int(getattr(config, "SMTP_PORT", 587))
+    skip_auth = getattr(config, "SKIP_SMTP_AUTH", False)
+
+    masked = _mask_recipients(rcpts)
+    if config.DEBUG:
+        logger.info("Preparing to send digest to %d recipients: %s", len(rcpts), ", ".join(masked))
 
     def _open_smtp():
         if smtp_port == 465:
             context = ssl.create_default_context()
             server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=SMTP_TIMEOUT, context=context)
-            server.login(from_addr, config.EMAIL_PASSWORD)
+            if not skip_auth:
+                if not getattr(config, "EMAIL_PASSWORD", None):
+                    raise RuntimeError("EMAIL_PASSWORD required for SMTP authentication")
+                server.login(from_addr, config.EMAIL_PASSWORD)
             return server
         else:
             server = smtplib.SMTP(smtp_server, smtp_port, timeout=SMTP_TIMEOUT)
@@ -90,7 +102,10 @@ def send_digest(
             except smtplib.SMTPException:
                 if config.DEBUG:
                     logger.debug("STARTTLS failed or unsupported; continuing without STARTTLS")
-            server.login(from_addr, config.EMAIL_PASSWORD)
+            if not skip_auth:
+                if not getattr(config, "EMAIL_PASSWORD", None):
+                    raise RuntimeError("EMAIL_PASSWORD required for SMTP authentication")
+                server.login(from_addr, config.EMAIL_PASSWORD)
             return server
 
     server = None
@@ -106,9 +121,9 @@ def send_digest(
                     sent_count += 1
                 except Exception as exc:
                     logger.error("Failed sending to %s: %s", r, exc)
-                if config.DEBUG:
-                    logger.info("Sent %d individual messages", sent_count)
-                return
+            if config.DEBUG:
+                logger.info("Sent %d individual messages", sent_count)
+            return
         else:
             generic_to = from_addr
             msg = _build_message(from_addr=from_addr, to_addr=generic_to, subject=subject, html_body=html_body, text_body=text_body, reply_to=reply_to)
