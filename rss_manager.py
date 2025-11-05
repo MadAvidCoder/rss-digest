@@ -34,6 +34,7 @@ def _row_to_feed(row: Any) -> Dict[str, Optional[Any]]:
 def run_once(
     feed_urls: Optional[List[str]] = None,
     max_entries_per_feed: Optional[int] = None,
+    persist: bool = True,
 ) -> List[Dict]:
     new_articles: List[Dict] = []
 
@@ -74,7 +75,7 @@ def run_once(
         if not url:
             continue
         if config.DEBUG:
-            logger.info("Fetching feed %s (feed_id=%s)", url, feed_id)
+            logger.info("Fetching feed %s (feed_id=%s, persist=%s)", url, feed_id, persist)
 
         try:
             result = feeds.fetch_feed(url, max_entries=max_entries_per_feed)
@@ -90,15 +91,29 @@ def run_once(
                 summary = e.get("summary") or ""
                 published = e.get("published")
 
-                if feed_id is not None:
+                if persist and feed_id is not None:
                     try:
                         if db.article_exists(feed_id, link):
                             continue
                     except Exception:
                         logger.debug("article_exists check failed for feed_id=%s link=%s; will attempt insert", feed_id, link)
 
-                try:
-                    db.add_article(feed_id, title, link, summary, None, published)
+                if persist:
+                    try:
+                        db.add_article(feed_id, title, link, summary, None, published)
+                        new_articles.append({
+                            "feed_id": feed_id,
+                            "feed_url": url,
+                            "guid": e.get("guid"),
+                            "title": title,
+                            "link": link,
+                            "summary": summary,
+                            "published": published,
+                        })
+                    except Exception as exc:
+                        logger.exception("Failed to insert article for feed %s: %s", url, exc)
+                        continue
+                else:
                     new_articles.append({
                         "feed_id": feed_id,
                         "feed_url": url,
@@ -108,9 +123,6 @@ def run_once(
                         "summary": summary,
                         "published": published,
                     })
-                except Exception as exc:
-                    logger.exception("Failed to insert article for feed %s: %s", url, exc)
-                    continue
 
             except Exception as exc:
                 logger.exception("Failed processing entry from feed %s: %s", url, exc)

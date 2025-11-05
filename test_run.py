@@ -56,7 +56,7 @@ def main():
         return 2
 
     try:
-        new_items = rss_manager.run_once(max_entries_per_feed=config.MAX_ENTRIES_PER_FEED)
+        new_items = rss_manager.run_once(max_entries_per_feed=config.MAX_ENTRIES_PER_FEED, persist=False)
     except Exception as exc:
         logger.exception("rss_manager.run_once failed: %s", exc)
         return 3
