@@ -41,26 +41,46 @@ def fetch_feed(
     modified: Optional[float] = None,
     max_entries: Optional[int] = None,
 ) -> Dict:
-    parse_kwargs = {
-        "request_headers": {"User-Agent": USER_AGENT},
-        "timeout": timeout,
-    }
+    headers = {"User-Agent": USER_AGENT}
     if etag:
-        parse_kwargs["etag"] = etag
+        headers["If-None-Match"] = etag
     if modified:
-        parse_kwargs["modified"] = modified
+        headers["If-Modified-Since"] = modified
 
-    d = feedparser.parse(url, **parse_kwargs)
+    try:
+        resp = requests.get(url, headers=headers, timeout=timeout)
+    except requests.RequestException as exc:
+        return {
+            "entries": [],
+            "status": None,
+            "etag": None,
+            "modified": None,
+            "bozo": True,
+            "bozo_exception": exc,
+        }
 
-    status = getattr(d, "status", None) or d.get("status")
-    returned_etag = getattr(d, "etag", None) or d.get("etag")
-    returned_modified = getattr(d, "modified", None) or d.get("modified")
+    status = resp.status_code
+    returned_etag = resp.headers.get("ETag")
+    returned_modified = resp.headers.get("Last-Modified")
+
+    if status == 304:
+        return {
+            "entries": [],
+            "status": status,
+            "etag": returned_etag,
+            "modified": returned_modified,
+            "bozo": False,
+            "bozo_exception": None,
+        }
+
+    content = resp.content or b""
+    d = feedparser.parse(content)
+
     bozo = getattr(d, "bozo", False)
     bozo_exc = getattr(d, "bozo_exception", None)
 
     entries_raw = getattr(d, "entries", []) or d.get("entries", [])
     entries: List[Dict] = []
-
     for e in entries_raw:
         try:
             ne = normalise_entry(e)
