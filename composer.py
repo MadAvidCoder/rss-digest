@@ -341,7 +341,7 @@ def compose_digest(
 
     prepared = [_prepare_item(it, max_summary_chars) for it in items]
 
-    subject = subject_override or f"{getattr(config, 'SUBJECT_PREFIX', '[RSS]')} Daily Digest — {datetime.utcnow().date()}"
+    subject = subject_override or f"{getattr(config, 'SUBJECT_PREFIX', '[RSS]')} Daily Digest — {datetime.now(UTC).date()}"
 
     if not preheader:
         if intro:
@@ -367,7 +367,7 @@ def compose_digest(
         items=prepared,
         intro=intro or "",
         from_name=getattr(config, "FROM_NAME", "RSS Digest"),
-        generated_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+        generated_at=datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
         brand_icon=brand_icon,
         preheader=pre,
     )
