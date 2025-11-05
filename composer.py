@@ -14,123 +14,180 @@ HTML_TEMPLATE = """
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>{{ subject }}</title>
   <style>
-    :root{
-      --bg: #f5f7fb;
-      --panel: #ffffff;
-      --muted: #6b7280;
-      --accent: #0f62fe;
-      --accent-2: #1464f4;
-      --card-border: #e6eaf0;
-      --radius:12px;
-      --maxw:760px;
-      --shadow: 0 6px 18px rgba(18, 21, 26, 0.06);
-    }
-    html,body{height:100%}
-    body{
-      margin:0; padding:22px; background:var(--bg);
-      font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      color:#0f172a;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
-    .container{max-width:var(--maxw); margin:0 auto;}
-    .panel{background:var(--panel); border-radius:16px; padding:18px; box-shadow:var(--shadow); border:1px solid var(--card-border);}
-    .header{display:flex; align-items:center; gap:14px; padding-bottom:12px; border-bottom:1px solid #f0f3f7;}
-    .brand {font-weight:700; font-size:20px; color:var(--accent);}
-    .tagline{color:var(--muted); font-size:13px;}
-    .meta-row{display:flex; gap:8px; align-items:center; margin-left:auto; color:var(--muted); font-size:13px;}
-    .toc{margin:14px 0; color:var(--muted); font-size:14px;}
-    .toc ul{padding-left:18px; margin:6px 0;}
-    .toc a{color:var(--accent); text-decoration:none;}
-    .items{margin-top:14px; display:flex; flex-direction:column; gap:12px;}
-    .item{display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.6)); border:1px solid #f1f4f8;}
-    .left {flex:1 1 auto; min-width:0;}
-    .thumbnail{width:156px; height:100px; flex:0 0 156px; border-radius:8px; object-fit:cover; border:1px solid var(--card-border); background:#f7fafc;}
-    .title{font-size:16px; font-weight:700; margin:0 0 6px 0; color:#071033;}
-    .summary{color:#0b1220; font-size:14px; line-height:1.4; margin-bottom:8px; overflow:hidden;}
-    .meta{color:var(--muted); font-size:13px; margin-bottom:8px;}
-    .actions{display:flex; gap:8px; align-items:center;}
-    .btn{
-      display:inline-block; padding:9px 12px; border-radius:8px; color:#fff; text-decoration:none; font-size:13px;
-      background:linear-gradient(90deg,var(--accent),var(--accent-2));
-      box-shadow: 0 6px 18px rgba(15,98,254,0.12);
-    }
-    .muted-link{color:var(--accent); text-decoration:none; font-weight:600; font-size:13px;}
-    .feed-badge{display:inline-flex; gap:8px; align-items:center;}
-    .feed-icon{width:28px; height:28px; border-radius:6px; object-fit:cover; border:1px solid var(--card-border); background:#fff;}
-    footer{margin-top:18px; font-size:13px; color:var(--muted); text-align:center;}
-    @media (max-width:720px){
-      .item{flex-direction:column;}
-      .thumbnail{width:100%; height:170px; flex:0 0 auto;}
+    /* Minimal fallback styles; main styling is inline for clients that drop head styles */
+    @media only screen and (max-width:620px){
+      .container{width:100% !important;}
+      .two-col{display:block !important; width:100% !important;}
+      .col{display:block !important; width:100% !important;}
+      .thumbnail{width:100% !important; height:auto !important;}
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <div class="panel">
-      <div class="header">
-        <div style="display:flex;gap:12px;align-items:center">
-          <img src="{{ brand_icon }}" alt="" width="44" height="44" style="border-radius:10px;object-fit:cover;border:1px solid #eee;"/>
-          <div>
-            <div class="brand">{{ from_name }}</div>
-            <div class="tagline">{{ subject }}</div>
-          </div>
-        </div>
-        <div class="meta-row">
-          <div>generated {{ generated_at }}</div>
-        </div>
-      </div>
+<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <!-- Preheader: hidden in the message body but shown by many inboxes as the preview snippet -->
+  <span style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+    {{ preheader }}
+  </span>
 
-      {% if intro %}
-      <div style="margin-top:12px;color:var(--muted)">{{ intro }}</div>
-      {% endif %}
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background-color:#f4f6f8;width:100%;padding:18px 12px;">
+    <tr>
+      <td align="center">
+        <table class="container" width="700" cellpadding="0" cellspacing="0" border="0" role="presentation" style="width:700px;max-width:700px;">
+          <tr>
+            <td style="padding:12px 0;text-align:left;">
+              <!-- Header / Hero -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background:#ffffff;border-radius:10px;padding:18px;border:1px solid #e9eef5;">
+                <tr>
+                  <td style="vertical-align:middle;padding-bottom:12px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <img src="{{ brand_icon }}" width="48" height="48" alt="" style="display:block;border-radius:8px;border:1px solid #eef3fa;"/>
+                        </td>
+                        <td style="vertical-align:middle;padding-left:12px;">
+                          <div style="font-size:18px;font-weight:700;color:#0b2a66;line-height:1.1;">{{ from_name }}</div>
+                          <div style="font-size:13px;color:#6b7280;margin-top:6px;">{{ subject }}</div>
+                        </td>
+                        <td style="vertical-align:middle;text-align:right;">
+                          <div style="font-size:12px;color:#94a3b8;">{{ generated_at }}</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
 
-      {% if items %}
-      <div class="toc">
-        <strong>In this digest ({{ items|length }})</strong>
-        <ul>
+                {% if intro %}
+                <tr>
+                  <td style="padding:8px 0 14px 0;font-size:14px;color:#374151;">
+                    {{ intro }}
+                  </td>
+                </tr>
+                {% endif %}
+
+                <!-- TOC -->
+                {% if items %}
+                <tr>
+                  <td style="padding:6px 0 12px 0;">
+                    <div style="font-size:13px;color:#6b7280;font-weight:600;margin-bottom:8px;">In this digest ({{ items|length }})</div>
+                    <table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%" style="border-collapse:collapse;">
+                      {% for it in items %}
+                      <tr>
+                        <td style="padding:6px 0;">
+                          <a href="#item-{{ loop.index0 }}" style="color:#0f62fe;text-decoration:none;font-size:14px;">{{ loop.index }}. {{ it.title }}</a>
+                          <div style="color:#8292a6;font-size:12px;margin-top:2px;">{{ it.feed_title or it.feed_url }}</div>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
+              </table>
+            </td>
+          </tr>
+
+          <!-- Items -->
           {% for it in items %}
-            <li><a href="#item-{{ loop.index0 }}">{{ loop.index }}. {{ it.title }}</a> — <span style="color:var(--muted)">{{ it.feed_title or it.feed_url }}</span></li>
+          <tr>
+            <td style="padding-top:12px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background:#ffffff;border-radius:10px;border:1px solid #e9eef5;">
+                <tr>
+                  <td style="padding:12px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                      <tr class="two-col">
+                        <!-- Content column -->
+                        <td class="col" valign="top" style="padding-right:12px;vertical-align:top;">
+                          <table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%">
+                            <tr>
+                              <td style="padding-bottom:8px;">
+                                <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                                  <tr>
+                                    <td style="vertical-align:middle;padding-right:8px;">
+                                      <img src="{{ it.feed_icon }}" width="28" height="28" alt="" style="display:block;border-radius:6px;border:1px solid #eef3fa;" />
+                                    </td>
+                                    <td style="vertical-align:middle;font-size:13px;color:#6b7280;">
+                                      <strong style="font-weight:700;color:#0b2a66;">{{ it.feed_title or it.feed_url }}</strong>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td style="padding-bottom:8px;">
+                                <a href="{{ it.link }}" style="color:#071033;text-decoration:none;font-size:16px;font-weight:700;">{{ it.title }}</a>
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td style="padding-bottom:10px;color:#6b7280;font-size:13px;">
+                                {% if it.category %}{{ it.category }} · {% endif %}{% if it.published %}{{ it.published|datetimeformat }}{% endif %}
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td style="padding-bottom:12px;color:#333a52;font-size:14px;line-height:1.45;">
+                                {{ it.summary | safe }}
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td>
+                                <!-- Button row -->
+                                <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                                  <tr>
+                                    <td>
+                                      <a href="{{ it.link }}" style="background-color:#0f62fe;border-radius:6px;color:#ffffff;display:inline-block;padding:10px 14px;text-decoration:none;font-weight:600;font-size:13px;">
+                                        Read article
+                                      </a>
+                                    </td>
+                                    <td style="width:12px;">&nbsp;</td>
+                                    <td>
+                                      <a href="{{ it.link }}" style="color:#0f62fe;text-decoration:none;font-size:13px;font-weight:600;">Open in new tab</a>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+
+                          </table>
+                        </td>
+
+                        <!-- Thumbnail column -->
+                        <td class="col" valign="top" style="width:180px;">
+                          {% if it.thumbnail %}
+                          <a href="{{ it.link }}"><img alt="" class="thumbnail" src="{{ it.thumbnail }}" width="170" height="110" style="display:block;border-radius:8px;border:1px solid #eef3fa;object-fit:cover;max-width:100%;height:auto;" /></a>
+                          {% else %}
+                          <div style="width:170px;height:110px;border-radius:8px;border:1px solid #eef3fa;background:#fbfdff;color:#6b7280;display:flex;align-items:center;justify-content:center;font-size:13px;">
+                            {{ it.feed_title or '' }}
+                          </div>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
           {% endfor %}
-        </ul>
-      </div>
 
-      <div class="items">
-        {% for it in items %}
-        <article id="item-{{ loop.index0 }}" class="item">
-          <div class="left">
-            <div class="feed-badge" style="margin-bottom:8px">
-              <img class="feed-icon" src="{{ it.feed_icon }}" alt="" />
-              <div style="font-size:13px;color:var(--muted)">{{ it.feed_title or it.feed_url }}</div>
-            </div>
-            <div class="title"><a class="muted-link" href="{{ it.link }}">{{ it.title }}</a></div>
-            <div class="meta">
-              {% if it.category %}<span>{{ it.category }}</span> · {% endif %}
-              {% if it.published %}<span>{{ it.published|datetimeformat }}</span>{% endif %}
-            </div>
-            <div class="summary">{{ it.summary | safe }}</div>
-            <div class="actions">
-              <a class="btn" href="{{ it.link }}" target="_blank" rel="noopener">Read article</a>
-              <a class="muted-link" href="{{ it.link }}" target="_blank" rel="noopener">Open in new tab</a>
-            </div>
-          </div>
-          {% if it.thumbnail %}
-            <img class="thumbnail" src="{{ it.thumbnail }}" alt="thumbnail"/>
-          {% else %}
-            <div style="width:156px;height:100px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;border-radius:8px;background:#fafbfc;border:1px solid var(--card-border)">{{ it.feed_title or "" }}</div>
-          {% endif %}
-        </article>
-        {% endfor %}
-      </div>
-      {% else %}
-        <div style="padding:18px;color:var(--muted)">No new items.</div>
-      {% endif %}
+          <tr>
+            <td style="padding-top:14px;text-align:center;">
+              <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                <tr>
+                  <td style="font-size:13px;color:#94a3b8;">
+                    Sent by {{ from_name }} — {{ generated_at }}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-      <footer>
-        Sent by {{ from_name }} — <span style="color:var(--muted)">generated {{ generated_at }}</span>
-      </footer>
-    </div>
-  </div>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
 """
@@ -277,6 +334,7 @@ def compose_digest(
     max_items: Optional[int] = None,
     intro: Optional[str] = None,
     max_summary_chars: int = 600,
+    preheader: Optional[str] = None
 ) -> Tuple[str, str, str]:
     if max_items is not None:
         items = items[:max_items]
@@ -284,6 +342,17 @@ def compose_digest(
     prepared = [_prepare_item(it, max_summary_chars) for it in items]
 
     subject = subject_override or f"{getattr(config, 'SUBJECT_PREFIX', '[RSS]')} Daily Digest — {datetime.utcnow().date()}"
+
+    if not preheader:
+        if intro:
+            pre = intro.strip()
+        elif prepared and prepared[0].get("short_summary"):
+            pre = prepared[0]["short_summary"][:140]
+        else:
+            pre = subject
+    else:
+        pre = preheader
+
     tpl = Template(HTML_TEMPLATE)
     tpl.environment.filters["datetimeformat"] = _datetimeformat
 
@@ -300,6 +369,7 @@ def compose_digest(
         from_name=getattr(config, "FROM_NAME", "RSS Digest"),
         generated_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
         brand_icon=brand_icon,
+        preheader=pre,
     )
 
     toc_lines = []
