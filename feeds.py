@@ -4,6 +4,7 @@ from datetime import datetime
 import time
 from typing import List, Dict, Optional, Any
 import feedparser
+import requests
 
 USER_AGENT = "rss-digest/1.0 (+https://github.com/MadAvidCoder/rss-digest)"
 
