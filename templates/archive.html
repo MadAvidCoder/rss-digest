@@ -5,7 +5,7 @@
     <ul>
         {% for d in digests %}
         <li style="margin-bottom:8px;">
-            <a href="{{ url_for('serve_digest', filename=d.file) }}">{{ d.subject }}</a>
+            <a href="{{ url_for('serve_digest', filename=d.filename) }}">{{ d.subject }}</a>
             <div class="small muted">{{ d.generated_at }} — {{ d.item_count }} items</div>
         </li>
         {% endfor %}

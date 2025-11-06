@@ -39,7 +39,7 @@
     <ul>
         {% for d in digests %}
         <li style="margin-bottom:6px;">
-            <a href="{{ url_for('admin_view_digest', filename=d.file) }}" target="_blank">{{ d.subject }}</a>
+            <a href="{{ url_for('admin_view_digest', filename=d.filename) }}" target="_blank">{{ d.subject }}</a>
             <span class="small muted"> — {{ d.generated_at }} ({{ d.item_count }} items)</span>
         </li>
         {% endfor %}
