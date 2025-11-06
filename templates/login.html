@@ -25,11 +25,6 @@
                 <button type="submit">Sign in</button>
             </div>
         </form>
-        <div class="small">
-            {% if not (os.environ.get('ADMIN_PASSWORD') if (os is defined) else False) %}
-            Warning: ADMIN_PASSWORD is not set on the server; this login page will redirect you to the unprotected admin UI.
-            {% endif %}
-        </div>
     </div>
 </div>
 </body>
