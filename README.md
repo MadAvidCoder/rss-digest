@@ -6,7 +6,7 @@
 ![Commits](https://img.shields.io/github/commit-activity/t/madavidcoder/rss-digest)
 ![Last Commit](https://img.shields.io/github/last-commit/madavidcoder/rss-digest)
 ![Website Status](https://img.shields.io/website?url=https%3A%2F%2Frss.madavidcoder.hackclub.app)
----
+
 **RSS Digest is an RSS aggregator that composes a daily HTML digest of new articles from selected RSS feeds. View the archive [here](https://rss.madavidcoder.hackclub.app)!**
 
 ## Usage
