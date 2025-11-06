@@ -47,7 +47,7 @@ def public_latest():
         storage.save_digest_index(idx)
         return redirect(url_for("public_archive"))
     digest_html = html_path.read_text(encoding="utf-8")
-    return render_template("public.html", digest_html=digest_html, subject=latest["subject"], generated_at=latest["generated_at"])
+    return render_template("public.html", digest_html=digest_html, subject=latest["subject"], generated_at=latest["timestamp"])
 
 @app.route("/archive")
 def public_archive():
