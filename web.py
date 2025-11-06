@@ -1,11 +1,8 @@
 import os
-import json
 import logging
-from datetime import datetime
 from pathlib import Path
 from typing import List
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort, Response
-from werkzeug import Response
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort
 
 import config
 import db
@@ -141,7 +138,7 @@ def admin_run_digest():
             return redirect(url_for("admin_index"))
         try:
             mailer.send_digest(recipients=recips, subject=subject, html_body=html_body, text_body=text_body,
-                               send_individually=config.SEND_INDIVIDUALLY, use_bcc=config.USE_BCC)
+                               send_individually=config.SEND_INDIVIDUALLY)
             flash(f"Digest sent to {len(recips)} recipients.", "success")
         except Exception as e:
             logger.exception("send_digest failed")
