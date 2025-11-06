@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Admin login</title>
+    <style>
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f6f8fa;margin:0;padding:18px;}
+        .wrap{max-width:720px;margin:0 auto;}
+        .panel{background:white;border-radius:10px;padding:16px;border:1px solid #e6e9ee;}
+        label{display:block;margin-bottom:6px;font-weight:600;}
+        input[type="password"]{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;}
+        button{background:#1f6feb;color:white;padding:8px 12px;border-radius:6px;border:0;cursor:pointer;}
+        .small{font-size:13px;color:#64748b;margin-top:8px;}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="panel">
+        <h2>Admin login</h2>
+        <form method="post" action="{{ url_for('admin_login', next=request.args.get('next')) }}">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" />
+            <div style="margin-top:10px;">
+                <button type="submit">Sign in</button>
+            </div>
+        </form>
+        <div class="small">
+            {% if not (os.environ.get('ADMIN_PASSWORD') if (os is defined) else False) %}
+            Warning: ADMIN_PASSWORD is not set on the server; this login page will redirect you to the unprotected admin UI.
+            {% endif %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -2,7 +2,9 @@ import os
 import logging
 from pathlib import Path
 from typing import List
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort, session
+from functools import wraps
+import secrets
 
 import config
 import db
@@ -19,7 +21,19 @@ logging.basicConfig(level=logging.DEBUG if config.DEBUG else logging.INFO,
 
 BASE_DIR = Path.cwd()
 app = Flask("RSS Digest")
-app.secret_key = os.environ.get("FLASK_SECRET", "dev-secret")
+app.secret_key = secrets.token_urlsafe(32)
+
+def admin_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        admin_pw = os.environ.get("ADMIN_PASSWORD")
+        if not admin_pw:
+            logger.warning("WARNING: ADMIN_PASSWORD not set -> admin routes are unprotected")
+            return func(*args, **kwargs)
+        if session.get("admin_authenticated"):
+            return func(*args, **kwargs)
+        return redirect(url_for("admin_login", next=request.path))
+    return wrapper
 
 def load_recipients() -> List[str]:
     try:
@@ -63,7 +77,33 @@ def serve_digest(filename):
         abort(404)
     return send_file(safe)
 
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    admin_pw = os.environ.get("ADMIN_PASSWORD")
+    if not admin_pw:
+        flash("ADMIN_PASSWORD not configured. Admin UI is currently unprotected.", "warning")
+        return redirect(url_for("admin_index"))
+
+    if request.method == "POST":
+        pw = request.form.get("password", "")
+        if pw == admin_pw:
+            session["admin_authenticated"] = True
+            flash("Logged in to admin", "success")
+            next_url = request.args.get("next") or url_for("admin_index")
+            return redirect(next_url)
+        else:
+            flash("Invalid password", "error")
+            return render_template("login.html")
+    return render_template("login.html")
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop("admin_authenticated", None)
+    flash("Logged out", "success")
+    return redirect(url_for("admin_login"))
+
 @app.route("/admin")
+@admin_required
 def admin_index():
     feeds = db.get_feeds()
     normalized = []
@@ -86,6 +126,7 @@ def admin_index():
     return render_template("admin.html", feeds=normalized, recipients=recips, digests=digests)
 
 @app.route("/admin/feeds/add", methods=["POST"])
+@admin_required
 def admin_add_feed():
     url = request.form.get("url", "").strip()
     if not url:
@@ -100,6 +141,7 @@ def admin_add_feed():
     return redirect(url_for("admin_index"))
 
 @app.route("/admin/feeds/delete/<int:feed_id>", methods=["POST"])
+@admin_required
 def admin_delete_feed(feed_id):
     try:
         db.delete_feed(feed_id)
@@ -110,6 +152,7 @@ def admin_delete_feed(feed_id):
     return redirect(url_for("admin_index"))
 
 @app.route("/admin/recipients", methods=["POST"])
+@admin_required
 def admin_save_recipients():
     raw = request.form.get("recipients", "")
     lines = [l.strip() for l in __import__("re").split(r"[,\n]+", raw) if l.strip()]
@@ -121,6 +164,7 @@ def admin_save_recipients():
     return redirect(url_for("admin_index"))
 
 @app.route("/admin/run", methods=["POST"])
+@admin_required
 def admin_run_digest():
     logger.info("Admin initiated run: fetch/persist/compose/send")
     try:
@@ -150,6 +194,7 @@ def admin_run_digest():
 
 
 @app.route("/admin/digests/<path:filename>")
+@admin_required
 def admin_view_digest(filename):
     safe = (storage.DIGESTS_DIR / filename).resolve()
     if storage.DIGESTS_DIR not in safe.parents and safe != storage.DIGESTS_DIR:

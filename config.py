@@ -47,3 +47,5 @@ MAX_ITEMS = _int_or_none(os.environ.get("MAX_ITEMS"))
 FEED_URLS = [u.strip() for u in os.environ.get("FEED_URLS", "").split(",") if u.strip()]
 
 TEST_EMAIL = os.environ.get("TEST_EMAIL")
+
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
