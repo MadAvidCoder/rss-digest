@@ -41,9 +41,9 @@ def public_latest():
     if not index:
         return render_template("public_empty.html", title="No digests yet")
     latest = index[0]
-    html_path = (storage.DIGESTS_DIR / latest["file"])
+    html_path = (storage.DIGESTS_DIR / latest["filename"])
     if not html_path.exists():
-        idx = [e for e in index if (storage.DIGESTS_DIR / e["file"]).exists()]
+        idx = [e for e in index if (storage.DIGESTS_DIR / e["filename"]).exists()]
         storage.save_digest_index(idx)
         return redirect(url_for("public_archive"))
     digest_html = html_path.read_text(encoding="utf-8")
