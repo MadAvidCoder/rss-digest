@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+    <h1>Admin dashboard</h1>
+    <div style="margin-top:10px" class="small muted">Manage feeds, recipients, and trigger a manual digest send.</div>
+
+    <h3 style="margin-top:12px">Feeds</h3>
+    <form action="{{ url_for('admin_add_feed') }}" method="post" style="margin-bottom:8px;">
+        <input name="url" placeholder="https://example.com/feed" style="width:70%;" />
+        <button class="btn" type="submit">Add feed</button>
+    </form>
+
+    <ul>
+        {% for f in feeds %}
+        <li style="margin-bottom:6px;">
+            <strong>{{ f.url }}</strong>
+            {% if f.id %}
+            <form action="{{ url_for('admin_delete_feed', feed_id=f.id) }}" method="post" style="display:inline;">
+                <button style="margin-left:8px;" type="submit">Delete</button>
+            </form>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h3 style="margin-top:12px">Recipients</h3>
+    <form action="{{ url_for('admin_save_recipients') }}" method="post">
+        <textarea name="recipients" rows="4" style="width:100%;">{{ recipients|join("\n") }}</textarea>
+        <div style="margin-top:6px;"><button class="btn" type="submit">Save recipients</button></div>
+    </form>
+
+    <h3 style="margin-top:12px">Create & Send</h3>
+    <form action="{{ url_for('admin_run_digest') }}" method="post">
+        <div style="margin-bottom:8px;">This will fetch feeds, persist new articles, compose a digest and send it to the configured recipients.</div>
+        <button class="btn" type="submit">Create & Send Digest Now</button>
+    </form>
+
+    <h3 style="margin-top:12px">Cached digests</h3>
+    <ul>
+        {% for d in digests %}
+        <li style="margin-bottom:6px;">
+            <a href="{{ url_for('admin_view_digest', filename=d.file) }}" target="_blank">{{ d.subject }}</a>
+            <span class="small muted"> — {{ d.generated_at }} ({{ d.item_count }} items)</span>
+        </li>
+        {% endfor %}
+        {% if not digests %}
+        <li class="small muted">No cached digests yet</li>
+        {% endif %}
+    </ul>
+
+</div>
+{% endblock %}

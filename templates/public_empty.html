@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+    <h1>No digests yet</h1>
+    <p class="small muted">Run the admin "Create & Send" to generate the first digest.</p>
+    <p><a href="{{ url_for('admin_index') }}">Admin dashboard</a></p>
+</div>
+{% endblock %}

@@ -7,6 +7,8 @@ import db
 import rss_manager
 import composer
 import mailer
+import recipients
+import storage
 
 logger = logging.getLogger("rss_digest")
 logging.basicConfig(level=logging.DEBUG if getattr(config, "DEBUG", False) else logging.INFO,
@@ -51,18 +53,44 @@ def main() -> int:
     logger.info("Found %d new articles; composing digest", len(new_items))
 
     max_items = getattr(config, "MAX_ITEMS", None)
-    subject, html_body, text_body = composer.compose_digest(new_items, max_items=max_items)
+    try:
+        subject, html_body, text_body = composer.compose_digest(new_items, max_items=max_items)
+    except Exception as exc:
+        logger.exception("Failed to compose digest: %s", exc)
+        return 6
+
+    try:
+        filename = storage.write_digest_html(subject, html_body, len(new_items))
+        logger.info("Wrote digest HTML to digests/%s", filename)
+    except Exception as exc:
+        logger.exception("Failed to write digest HTML file: %s", exc)
+        filename = None
+
+    try:
+        recips = recipients.get_recipients() or getattr(config, "EMAIL_TO", [])
+    except Exception as exc:
+        logger.exception("Failed to read recipients from DB; falling back to config.EMAIL_TO: %s", exc)
+        recips = getattr(config, "EMAIL_TO", [])
+
+    if not recips:
+        logger.warning("No recipients configured; digest created but not sent")
+        return 0
 
     try:
         send_individual = getattr(config, "SEND_INDIVIDUALLY", False)
         mailer.send_digest(
-            recipients=config.EMAIL_TO,
+            recipients=recips,
             subject=subject,
             html_body=html_body,
             text_body=text_body,
             send_individually=send_individual,
         )
-        logger.info("Digest sent successfully to %s (mode: %s)", "[masked recipients]" if config.EMAIL_TO else "none", "individual" if send_individual else "bcc")
+        logger.info(
+            "Digest sent successfully to %d recipients (mode: %s); cached file: %s",
+            len(recips),
+            "individual" if send_individual else "bcc",
+            filename or "<none>",
+            )
     except Exception as exc:
         logger.exception("Failed to send digest: %s", exc)
         return 4

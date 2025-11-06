@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+    <h1>Digest archive</h1>
+    <ul>
+        {% for d in digests %}
+        <li style="margin-bottom:8px;">
+            <a href="{{ url_for('serve_digest', filename=d.file) }}">{{ d.subject }}</a>
+            <div class="small muted">{{ d.generated_at }} — {{ d.item_count }} items</div>
+        </li>
+        {% endfor %}
+        {% if not digests %}<li class="small muted">No cached digests yet</li>{% endif %}
+    </ul>
+    <p><a href="{{ url_for('public_latest') }}">View latest</a></p>
+</div>
+{% endblock %}

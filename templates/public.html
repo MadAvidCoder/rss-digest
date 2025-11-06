@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+    <h1>{{ subject }}</h1>
+    <div class="small muted">generated {{ generated_at }}</div>
+
+    <div style="margin-top:12px; border:1px solid #eee; padding:8px; background:#fff;">
+        {{ digest_html|safe }}
+    </div>
+
+    <div style="margin-top:12px;">
+        <a href="{{ url_for('public_archive') }}">View archive</a>
+    </div>
+</div>
+{% endblock %}
