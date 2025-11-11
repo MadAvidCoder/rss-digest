@@ -9,10 +9,10 @@
 
 **RSS Digest is an RSS aggregator that composes a daily HTML digest of new articles from selected RSS feeds. View the archive [here](https://rss.madavidcoder.hackclub.app)!**
 
-## Usage
+## 🚀 Usage
 RSS Digest will automatically create and send out a digest at 8:00AM each day. You can view an archive of past digests at [https://rss.madavidcoder.hackclub.app](https://rss.madavidcoder.hackclub.app). If you wish to join (or leave) the digest mailing list, and you're part of HackClub, please [DM me](https://hackclub.slack.com/team/U081TBVQLCX). Configuration of included feeds and email recipients is done via the Admin Dashboard ([https://rss.madavidcoder.hackclub.app/admin](https://rss.madavidcoder.hackclub.app/admin)) on the web app, which requires an admin password to use. 
 
-## Tech Stack
+## 🛠️ Tech Stack
 - **Core:** Modular Python 3 App
 - **Web Dashboard:** Flask
 - **Email Formatting:** Jinja2
@@ -22,7 +22,7 @@ RSS Digest will automatically create and send out a digest at 8:00AM each day. Y
 - **RSS Processer:** feedparser
 - **Hosting:** [HackClub Nest](https://hackclub.app)
 
-## Setup
+## 🔌 Setup
 In order to use RSS Digest yourself, first clone the repo, and install dependencies: 
 ```bash
 git clone https://github.com/madavidcoder/rss-digest.git
@@ -39,7 +39,7 @@ If you want to get daily digests, I advise setting up a cron job to automate run
 
 In order to access the web dashboard, run `python3 web.py` (again, ensure you've activated the virtual environment), and go to `localhost:42329` or `localhost:42329/admin`. If you wish to use this more often, I would recommend that you switch to a production server (e.g. gunicorn) and use a systemd job to keep it running.
 
-## Environment Variables
+## 🗝️ Environment Variables
 Create a `.env` file containing all these variables, with the values set to suit your application.
 ```dotenv
 DB_URL=postgresql://<YOUR-DATABASE-URL>
@@ -69,5 +69,5 @@ MAX_ITEMS=50
 ADMIN_PASSWORD=<ADMIN DASHBOARD PASSWORD>
 ```
 
-## License
+## ⚖️ License
 RSS Digest is licensed under the [MIT License](https://github.com/MadAvidCoder/rss-digest/blob/main/LICENSE). You are free to use, copy, modify, and/or publish this project, or any part thereof, for commercial or non-commercial purposes. Attribution is appreciated, but not required.
