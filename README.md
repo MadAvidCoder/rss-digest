@@ -70,4 +70,4 @@ ADMIN_PASSWORD=<ADMIN DASHBOARD PASSWORD>
 ```
 
 ## License
-RSS Digest is licensed under the MIT License. You are free to use, copy, modify, and/or publish this project, or any part thereof, for commercial or non-commercial purposes. Attribution is appreciated, but not required.
+RSS Digest is licensed under the [MIT License](https://github.com/MadAvidCoder/rss-digest/blob/main/LICENSE). You are free to use, copy, modify, and/or publish this project, or any part thereof, for commercial or non-commercial purposes. Attribution is appreciated, but not required.
